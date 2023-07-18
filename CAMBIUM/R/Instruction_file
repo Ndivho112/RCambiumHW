@@ -1,0 +1,79 @@
+#instruction file for CAMBIUM
+#replaces some switches and inputs that used to be done through the user interface of the pascal code.
+
+  [TODO] describe this in the documentation/introduction to the package, refer to publication, too.
+Menu_PhysOptions_WaterStressShape = 1 # 1= linear effect of water stress.  other =  nonlinear as option.
+  [TODO] Menu_PhysOptions_AuxSens = 0
+  [TODO] duration of secondary thickening (set at time of onset) = ONOFF -> def. 0
+  [TODO] cumulative temperature 5 default
+  [TODO] minsize cell wall thickening = 1
+  [TODO] RunningMeanDurationFoliage as parameter -
+  override vessel formation - parameter
+  [TODO] form_RadialFiles$TrackBar_RadialCellFiles$Position must be a new specifier
+  [TODO] form_RadialFiles$TrackBar_RadialCellFiles$Position- now called TrackBar_RadialCellFiles_Position
+  [TODO] Menu_Options_StartSizeVariation.Checked - now called StartSizeVariation - (TRUE FALSE) switch to enable somewhat random sizes
+  [TODO] Form_SegmentOptions.edit_SegmentLengthFibres.text  now called SegmentLengthFibres
+  could create an "instruction file" with these options - or pass them on as object already into R.
+   calculate modifiers uses an input from Form_CumulativeTemperature.TrackBar_CumTempDuration
+
+
+  change segment length
+  #DONE: specify limits for cell interactions --
+  form_MaxInterCellAdjust.CB_InterCellAdjustmentAnchor.Checked ?
+  menu_PhysOptions_XMCCrush$checked
+
+
+  ----
+  number of radial cell file ( must make sure minimum number to make cells form)
+  #DONE: Maximum intercell radial adjustment 0, 8, 20 mum
+  anchor growth of faster growing cell files (default: no)
+  [TODO] which I now call CumTempDuration and the user has to specify it somewhere else- maybe at input or in the instruction file ( if we go down this route.)
+  [TODO] use instruction file values later to sanity-check ranges.
+  [TODO] in auxFunctions.R form_calculationmethods$RG_AuxinConcChangeMethod$ItemIndex  -> AuxinConcChangeMethod can be 0 or 1- what does it mean
+  ThickeningDurationControl 0 or nonzero.
+  SecThickDur Menu_PhysOptions_SecThickDur$Checked  needs TRUE OR FALSE
+  MinSizeSecThickSet  Menu_PhysOptions_MinSizeSecThick$Checked
+  GrowthPhaseMinSize menu_PhysOptions_GrowthPhaseMinSize$Checked
+  form_CalculationMethods.RG_DeterminationMethod.ItemIndex is now:
+  CellIdentityDeterminationMethod <<- "Barlow"  # otpions: "Barlow" (Barlow and Luck) or "Canalisation" (Sachs, 1981 etc)
+
+MyErrorString <- ""
+  FieldChecks <- FALSE
+  RunDuration <- 0
+  WaterStressShape <<- TRUE # Menu_PhysOptions_WaterStressShape
+  AuxSens <<- TRUE # Menu_PhysOptions_AuxSens
+  CumTempDuration <<- 15
+  RadialCellFiles_Position <<- 4
+  StartSizeVariation <<- TRUE
+  SegmentLengthFibres <<- 200
+  SegmentLengthVessels <<- 400
+  AuxinConcChangeMethod <<- 0
+
+  ###########Thickening settings:
+  ThickeningDurationControl <<- 0. # 0 : wall thickening is increased when environmental stress increases
+                                   # 1 : wall theickening duration decreased when endironmental stress decreased.
+  SecThickDur <<- FALSE            # if TRUE: duration of sec thickening is set at time of onset of thickening.
+                                   # FALSE: if cond. change during time of secondary thickening, the duration can be changed.
+  MinSizeSecThickSet <<- TRUE      # if TRUE: Cell wall thickening does not commence until minsize is reached
+  #CBwallthickatlowgrowth          # TRUE FALSE - Wall thickening can commene as a result of low growth rates
+  #Maximum wall thicekning rate is incresed as result of temps tress
+  ###########
+
+  GrowthPhaseMinSize <<- FALSE
+  CellIdentityDeterminationMethod <<- "Barlow"  # options: "Barlow" (Barlow and Luck) or "Canalisation" (Sachs, 1981 etc)
+
+TempAcclimation        " "           # former edit_TempAcclimation.text. Can it be left empty? or can be a value
+SiteLat                -33           # 'Latitude must be between -90 degrees (S) and 90 degrees (N).
+
+InterCellAdjustment, TRUE,             #  TRUE FALSE if TRUE - need the parameter below:
+MaxIntCellAdjust,     8                #  Maximum intercell radial adjustment. range: 0, 8, 20 um
+
+LowerGrowthProportion    ?           # former Form_LowerGrowthProportion$TrackBar_LowerGrowthProportion$Position
+ThickRateEnvironment TRUE         # TRUE FALSE  former Form_DurationEnvironmentControl$CB_ThickRateEnvironment$Checked
+XMCCrush  TRUE # TRUE FALSE former menu_PhysOptions_XMCCrush$checked
+VesselForm TRUE ! TRUE FALSE former Menu_PhysOptions_VesselForm
+
+
+
+
+
