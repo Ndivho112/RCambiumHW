@@ -1,0 +1,59 @@
+﻿Species,ParameterName,ParameterValue,Units,ParameterDescription,Source,RepeatedWithCABALA
+E. nitens,AuxinLag,0.15,,The lag between auxin production in the canopy and effects at breast height,,FALSE
+E. nitens,AuxinSenstoLeafGrowth,0.5,,The sensitivity of the rate of change of auxin concentration to leaf production,,FALSE
+E. nitens,AuxinWallLoosenessSensitivity,0.5,,The sensitivity of the cell wall looseness to auxin sens (higher number = more sensitive),,FALSE
+E. nitens,b0Density,1050,,The intercept in the density calculation,Calculated from data,FALSE
+E. nitens,b1Density,-55,,The first coefficient (fib diam) in the density calculation,Calculated from data,FALSE
+E. nitens,b2Density,110,,The second coeffiecnt (fib wall thick) in the density calculation,Calculated from data,FALSE
+E. nitens,CellCycleSenstoAuxin,0.5,,The sensitivity of the cell cycle duration to auxin (or other morph. Field) concentration.  0 is least sensitive 1 is most,,FALSE
+E. nitens,DaysBeforeConductive,9,days,The minimum number of days before a vessel begins to conduct water,,FALSE
+E. nitens,ExpansionHoursBeforeSunset,1,Hours,The maximum number of hours before sunset that expansion can be expcted to begin,,FALSE
+E. nitens,MaxAuxConc,2,,,,FALSE
+E. nitens,MaxDailyFoliageAllocation,0.2,t/ha,the maximum allocation of photosynthate to foliage,,FALSE
+E. nitens,MaxDaysBeforeThickeningFib,10,days,The maximum number of days a cell can take from exit of the CZ before thickening commences in fibres,"Ridoutt and Sands, Drew",FALSE
+E. nitens,MaxDaysBeforeThickeningVess,10,days,The maximum number of days a cell can take from exit of the CZ before thickening commences in vessels,"Ridoutt and Sands, Drew",FALSE
+E. nitens,MaxDaysSecThickening,35,days,The maximum number of days for which a cell can continue sec thickening,,FALSE
+E. nitens,MaxFibreTD,10,um,Maximum tangential diameter of a fibre or fusiform initial,,FALSE
+E. nitens,MaxRDcz,11.5,um,,,FALSE
+E. nitens,MaxSDR,0.75,ug mg-1 day-1,The maximum starch deposition rate when allocation exceeds demand in the CZ,Sauter 2000,FALSE
+E. nitens,MaxStorageTotal,175,,,,FALSE
+E. nitens,MaxTDcz,18,um,,,FALSE
+E. nitens,MaxTempCambialGrowth,40,deg C,The maximum temperature above which no metabolic activity occurs in the cambial zone,,FALSE
+E. nitens,MaxVesselAuxinScore,30,,The maximum accumulated auxin value for a cell to become a vessel,,FALSE
+E. nitens,MaxWallThickRate,4,um2/day,Maximum rate of accumulation of wall area per day,,FALSE
+E. nitens,MaxWaterPotentialDrop,2,,,,FALSE
+E. nitens,MinAllocatedPNSForGrowth,0.00075,ng/cell,,,FALSE
+E. nitens,MinAuxConcChangeRate,0.0018,,,,FALSE
+E. nitens,MinAuxConcDivision,1.5,ng cm-2,,,FALSE
+E. nitens,MinAuxConcGrowth,0.75,,,,FALSE
+E. nitens,MinDDivision,6,um,,,FALSE
+E. nitens,MinInterVesselDist,150,um,The minimum distance between any two vessels at time of determination,,FALSE
+E. nitens,MinRainForDaytimeExpansion,12,mm,The minimum amount of daytime rain required to cause an expansion during the day,,FALSE
+E. nitens,MinRDSecThick,11.5,um,The minimum cell radial diameter required for sec thickening (only used if seelcted by user),,FALSE
+E. nitens,MinTempCambialGrowth,6,deg C,The minimum environmental temperature required for cell division and growth,,FALSE
+E. nitens,MinTimeForMitosis,1,days,Minimum time between mitoses of a cell,,FALSE
+E. nitens,MinVesselAuxinScore,9,,The minimum accumulated auxin value for a cell to become a vessel,,FALSE
+E. nitens,MinWallThickRateStorageUse,3.7,,,,FALSE
+E. nitens,MinWaterPotentialDrop,1,,,,FALSE
+E. nitens,NczMax,20,,,,FALSE
+E. nitens,OpTempCambialGrowth,16,deg C,The optimal temperature for growth and metabolic activity in the cambial zone,,FALSE
+E. nitens,OsmoticPotentialTurgorLoss,-1.65,,,,FALSE
+E. nitens,PhloemTransportLag,24,m/day,,,FALSE
+E. nitens,PMCMod,2.5,,The steepness of the auxin gradient on the phloem raletive to xylem sides of the CZ,,FALSE
+E. nitens,PotentialCondRatio,8,dimensionless,"The ratio of potential conductivity over the cell wall & membrane, vessels:fibres",,FALSE
+E. nitens,RadialGrowthContribution,50,%,,,FALSE
+E. nitens,RadTanExtRatio,1.5,um/um,The relative extensibility of radial to tangential walls: um change in one compared to the other for a given pressure and time,Assumed,FALSE
+E. nitens,RateofWPDrop,0.1,,,,FALSE
+E. nitens,RatioLengthRadFib,50,um/um,The ratio of cell length to cell radial diameter (fibres and fus. Initials),,FALSE
+E. nitens,RatioLengthRadVess,2,um/um,The ratio of cell length to cell radial diameter (vessels),,FALSE
+E. nitens,RunningMeanDurationFoliage,90,days,The number of days over which the running mean of foliage allocaiton is calculated,,FALSE
+E. nitens,RunningMeanDurationStem,10,days,The number of days over which the running mean of stem allocation is calculated,,FALSE
+E. nitens,SecondaryWallGrowthEfficiency,100,%,,,FALSE
+E. nitens,Vmax,1.45,um/day,Maximum rate of fibre expansion transversely,,FALSE
+E. nitens,WallConversionFactor,0.6,cc/g,effectively the specific volume of wood,Kellogg and Wangaard 1969,FALSE
+E. nitens,WallExtensRatio,8,dimensionless,"The ratio of wall extensibility, vessels:fibres",,FALSE
+E. nitens,WallThickDurationSensEnvironment,0.12,,The sensitivity of the duration of wall thickening to environment,,FALSE
+E. nitens,WaterDeficitSensitivityGrowth,0.1,,The sensitivity of cell growth to water deficits,,FALSE
+E. nitens,WPMax,-0.3,Mpa,Maximum water potential for this species,,FALSE
+E. nitens,WPMin,-3,MPA,,,FALSE
+E. nitens,YieldThreshold,0.2,MPa,,,FALSE
