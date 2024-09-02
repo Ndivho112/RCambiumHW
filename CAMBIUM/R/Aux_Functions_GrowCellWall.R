@@ -19,43 +19,70 @@
 #' Code translated from Pascal to R by: ChatGPT, Annemarie Eckes-Shephard
 #' @keywords primary wall, thickening, rate, differentiation, lumen volume
 #' @export
-#' @example
 CalculatePrimaryWallThickRate <- function(n) {
-  CellWallCSArea0 <- numeric(30001)
+  # Warning if n equals 66 or greater
+  if (n >= 66) {
+    warning("n is out of valid range: ", n)
+    return(NULL)  # Exit function gracefully
+  }
 
+  # Check if n is within a valid range
+  if (n < 1 || n > length(CellType)) {
+    stop("Error: Index n is out of bounds.")
+  }
+
+  # Initialize vectors if not already done
+  if (!exists("CellWallCSArea0")) CellWallCSArea0 <- numeric(30001)
+
+  # Check DifferentiationStatus and NewSecondaryWallFlag
   if (DifferentiationStatus[n] != "SECONDARYTHICKENING" || NewSecondaryWallFlag[n] == FALSE) {
-    print("in CalculatePrimaryWallThickRate")
-    print(n)
-    LumenVolume[n] <- BodyVolume(CellType[n], ( ((cellRD[n] + cellTD[n])/2) - PRIMARYWALLTHICKNESS*2),
-                                          ((cellRD[n] + cellTD[n])/2) - PRIMARYWALLTHICKNESS*2, CellLength[n])
-    # We calculate the lumen volume of cells not in secondary wall thickening assuming a primary wall thickness of 0.25um
+    print(paste("in CalculatePrimaryWallThickRate at n =", n))
 
+    # Calculating the lumen volume for cells not in secondary wall thickening
+    LumenVolume[n] <- BodyVolume(CellType[n], ((cellRD[n] + cellTD[n]) / 2 - PRIMARYWALLTHICKNESS * 2),
+                                 ((cellRD[n] + cellTD[n]) / 2) - PRIMARYWALLTHICKNESS * 2, CellLength[n])
+
+    # Ensure LumenVolume[n] is valid before proceeding
+    if (is.na(LumenCSArea[n])) {
+      stop(paste("problem: LumenCSArea[n] = NA at index", n))
+      return(NULL)
+    }
+
+    # Calculating the lumen cross-sectional area
     LumenCSArea[n] <- BodyCSArea(CellType[n], LumenVolume[n], CellLength[n], cellRD[n], cellTD[n])
- if(is.na(LumenCSArea[n])){
-   stop(print("problem:LumenCSArea[n] = NA",n))
- }
-    CellWallCSArea0[n] <- CellWallCSArea[n]
 
+    # Check if LumenCSArea[n] is NA
+    if (is.na(LumenCSArea[n])) {
+      warning(paste("Warning: LumenCSArea[n] is NA for n =", n))
+      return(NULL)  # Exit function to prevent further calculation errors
+    } else {
+      print(paste("LumenCSArea[n] =", LumenCSArea[n]))
+    }
+
+    CellWallCSArea0[n] <- CellWallCSArea[n]
     CellWallCSArea[n] <- CellCSArea[n] - LumenCSArea[n]
 
-    if (CellWallCSArea[n] < CellWallCSArea0[n]) {
+    # Ensure CellWallCSArea[n] is valid
+    if (is.na(CellWallCSArea[n])) {
+      PrimaryWallThickRate[n] <- NA
+      warning(paste("Warning: CellWallCSArea[n] is NA for n =", n))
+    } else if (CellWallCSArea[n] < CellWallCSArea0[n]) {
       PrimaryWallThickRate[n] <- 0
     } else {
       PrimaryWallThickRate[n] <- CellWallCSArea[n] - CellWallCSArea0[n]
     }
 
-    # Basically the wall thick rate is actually independent of the "potential" rate, but the ability to store material is affected...
+    # Print current values for debugging
+    cat("n:", n, "| CellWallCSArea[n]:", CellWallCSArea[n],
+        "| CellWallCSArea0[n]:", CellWallCSArea0[n], "\n")
 
-
-    #release to globalenv:
+    # Release to global environment only after ensuring all are valid
     LumenCSArea           <<- LumenCSArea
     CellWallCSArea        <<- CellWallCSArea
     PrimaryWallThickRate  <<- PrimaryWallThickRate
     LumenVolume           <<- LumenVolume
-
-    }
+  }
 }
-
 
 #' Calculate Potential Wall Thick Rate
 #'

@@ -23,7 +23,7 @@ run_CAMBIUM <- function(filename_forcing,filename_param,run_settings) {
   #run_settings[2,c(3,4,6:9,14,15,18)] <- as.numeric(run_settings[2,c(3,4,6:9,14,15,18)])
   #run_settings[2,13] <- as.character(run_settings[2,13])
   #must be "free-standing" run settings
- # InstructionName <- as.list(run_settings$Instruction_Name)
+  # InstructionName <- as.list(run_settings$Instruction_Name)
   #names(InstructionName) <- run_settings$Instruction_Name
   #for(i in seq_along(run_settings$Instruction_Name)) {
   #  assign(run_settings$Instruction_Name[i],run_settings$Instruction_Value[i],envir = globalenv())
@@ -53,66 +53,66 @@ run_CAMBIUM <- function(filename_forcing,filename_param,run_settings) {
   MaxIntCellAdjust <<-     8
   XMCCrush <<- TRUE
   VesselForm <<- TRUE
-TESTING <<- FALSE
+  TESTING <<- FALSE
   #tryCatch({
-    #form_Main$refresh()
+  #form_Main$refresh()
 
-    print("Status: Initialising variables...")
-    #form_Main$refresh()
-    InitialiseVariables()  # AHES
+  print("Status: Initialising variables...")
+  #form_Main$refresh()
+  InitialiseVariables()  # AHES
 
-    print( "Status: Reading CABALA output data...")
-    #form_Main$refresh()
-    ReadForcingInput(filename_forcing) # replaces ReadCABALAOutput() in .pas # AHES
+  print( "Status: Reading CABALA output data...")
+  #form_Main$refresh()
+  ReadForcingInput(filename_forcing) # replaces ReadCABALAOutput() in .pas # AHES
 
-    print( "Status: Reading xylem parameters...")
-    #form_Main$refresh()
-    ReadParameters(filename_param)  # AHES
+  print( "Status: Reading xylem parameters...")
+  #form_Main$refresh()
+  ReadParameters(filename_param)  # AHES
 
-    #if (ModelProblem != TRUE && ModelStop != TRUE) {
-    print(  "Initialising model..." )
-     # form_Main$refresh()
+  #if (ModelProblem != TRUE && ModelStop != TRUE) {
+  print(  "Initialising model..." )
+  # form_Main$refresh()
 
-    CalculateModifiers()  # AHES
+  CalculateModifiers()  # AHES
 
-    #WritetoRunLog()
+  #WritetoRunLog()
 
-    #		//Initialise start variables for a realistic simulation start
-    InitialiseModelRun()
+  #		//Initialise start variables for a realistic simulation start
+  InitialiseModelRun()
 
-    day <- 2 # have to start with 2, because R works with index 1, vs pascal with index 0
+  day <- 2 # have to start with 2, because R works with index 1, vs pascal with index 0
 
-    print(  "Building the initial cell population...")
-      #form_Main$refresh()
-    BuildCellPopulation()  # AHES
+  print(  "Building the initial cell population...")
+  #form_Main$refresh()
+  BuildCellPopulation()  # AHES
 
 
-    if(debug_print==TRUE){
-      print(CellType[is.na(CellType)])# Testing
-    }
+  if(debug_print==TRUE){
+    print(CellType[is.na(CellType)])# Testing
+  }
 
-    print(  "Determining initial cell population...")
-      #form_Main$refresh()
-    DetermineEarlyCambialCells()  # AHES
+  print(  "Determining initial cell population...")
+  #form_Main$refresh()
+  DetermineEarlyCambialCells()  # AHES
 
-    if(debug_print==TRUE){
-      print(CellType[is.na(CellType)])# Testing
-    }
+  if(debug_print==TRUE){
+    print(CellType[is.na(CellType)])# Testing
+  }
 
-    totaldays=665
-    for (day in 2:totaldays) {
-      #  if (ModelStop != TRUE && ModelProblem != TRUE) {
-          print(paste("Modelling cell development on", logdate[day],
-                               "for CABALA scenario", RunNumber[day]))
+  totaldays=665
+  for (day in 2:totaldays) {
+    #  if (ModelStop != TRUE && ModelProblem != TRUE) {
+    print(paste("Modelling cell development on", logdate[day],
+                "for CABALA scenario", RunNumber[day]))
 
-          CoreModuleList(day,CellIdentityDeterminationMethod)  # AHES (biological operations happen here)
-        }
-   #   }
-   # }
- # }, error = function(E) {
- #   form_Main$ProgressBar_Main$position <- 0
- #   MyErrorString <- as.character(E$message)
- #   message(paste("The model run could not be successfully completed due to the following problem:",
+    CoreModuleList(day,CellIdentityDeterminationMethod)  # AHES (biological operations happen here)
+  }
+  #   }
+  # }
+  # }, error = function(E) {
+  #   form_Main$ProgressBar_Main$position <- 0
+  #   MyErrorString <- as.character(E$message)
+  #   message(paste("The model run could not be successfully completed due to the following problem:",
   #                MyErrorString), type = "error")
   #  ModelProblem <- TRUE
   #})

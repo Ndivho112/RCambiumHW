@@ -109,11 +109,14 @@ knitr::kable(runsettings, format = "markdown")
 # Model run
 
 ```{r model_run, eval=FALSE}
+debug_print = TRUE # for testing, have TRUE, prints more output during sim
 
-debug_print=TRUE # for testing, have TRUE, prints more output during sim
-run_CAMBIUM(filename_forcing = "/Users/annemarie/Documents/1_TreeMort/2_Analysis/3_analysis_WFM/Models/CAMBIUM/Forcing_Data_Parameters/CABALAOutputs.csv",
-            filename_param = "/Users/annemarie/Documents/1_TreeMort/2_Analysis/3_analysis_WFM/Models/CAMBIUM/Forcing_Data_Parameters/XylemParameters.csv",
-            run_settings =runsettings)
+#filename_forcing <- read.csv("./Forcing_Data_Parameters/CABALAOutputs.csv")
+#filename_param <- read.csv("./Forcing_Data_Parameters/XylemParameters.csv")
+# Run the CAMBIUM model
+output <- run_CAMBIUM(filename_forcing <-"./Forcing_Data_Parameters/CABALAOutputs.csv",
+                      filename_param <-"./Forcing_Data_Parameters/XylemParameters.csv",
+                      run_settings = runsettings)
 
 # filename_param should be made so that it could be replaced with the data frame that can be loaded in from the package data as shown in one of the above chunks.
 

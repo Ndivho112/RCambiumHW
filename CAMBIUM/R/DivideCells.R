@@ -19,7 +19,7 @@ DivideCells <- function(TotalLoopSize,day) {
   #DivisionFactor : double; done
   CritCellCycleDuration <- rep(NA,TotalCells)
 
-  if ((PhotosynthatePerCell[day] > MinAllocatedPNSForGrowth / 1000000) ||
+  if ((PhotosynthatePerCell[day] > MinAllocatedPNSForGrowth / 1e6) ||
       (WallThickStoreMass > MaxStorageTotal * 0.25)) {
     # Division can only occur if some PNS is allocated or there is a fair amount in storage
 
@@ -31,7 +31,13 @@ DivideCells <- function(TotalLoopSize,day) {
 
       for (LoopNumber in 1:TotalLoopSize) {
         n <- CellKey[LoopNumber] # changed cellnumber to n
+        # Control loop size: Ensure n is within bounds
+        if (n > 66) {
+          n <- 66
+        }
+        if (n <= 0 || n > length(CellKey)) {
         print(n)
+        }
 
         if (CellType[n] != "PHLOEMMOTHERCELL") {
 
@@ -73,8 +79,8 @@ DivideCells <- function(TotalLoopSize,day) {
                 DivisionFactor <- 0.6
               }
               # Division is somewhat random to prevent "groups" dividing at the same time
-print("cell division")
-print("##################################################################################")
+              print("cell division")
+              print("##################################################################################")
               cellRD_mem <- cellRD[n]
 
               cellRD[n] <- cellRD[n] * DivisionFactor
@@ -92,7 +98,7 @@ print("#########################################################################
               TimeSinceMitosis[n] <- 0
 
               # Now define general various properties for the newly formed cell (whose number is now the "TotalCells" value which cell was its mother)
-print("dividion occured")
+              print("dividion occured")
               TimeSinceMitosis[TotalCells] <- 0
 
               MeristematicStatus[TotalCells] <- "MERISTEMATIC"
@@ -154,10 +160,14 @@ print("dividion occured")
                 } else {
                   CellType[TotalCells] <- "RAYINITIALC"
                 }
+                print(paste("n =", n))
+                print(paste("UpperRadNeighbour[n] =", UpperRadNeighbour[n]))
+                print(paste("CellType[UpperRadNeighbour[n]] =", CellType[UpperRadNeighbour[n]]))
 
-                if (CellType[UpperRadNeighbour[n]] == "PHLOEMMOTHERCELL" ||
-                    CellType[UpperRadNeighbour[n]] == "RAYINITIALP" ||
-                    CambiumWidth[day] < 7) {
+                if (!is.na(UpperRadNeighbour[n]) && !is.na(CellType[UpperRadNeighbour[n]]) &&
+                    (CellType[UpperRadNeighbour[n]] == "PHLOEMMOTHERCELL" ||
+                     CellType[UpperRadNeighbour[n]] == "RAYINITIALP" ||
+                     CambiumWidth[day] < 7)) {
                   # If at least one PMC exists or "foliage conditions" are bad
                   # then produce XMC's
 
@@ -214,52 +224,51 @@ print("dividion occured")
                   RadPosition[n] <- RadPosition[n] - (cellRD_mem/2) + (cellRD[TotalCells]) + (cellRD[n]/2)
                 }
 
-            }#if (CellType[cellnumber] = CAMBIALINITIAL)
-          }#if (cellRD[cellnumber] > MinDDivision)
-        }#if (auxinconc[cellnumber]
-       }#if celldead[cellnumber]<>true
-     }#for LoopNumber :=1
+              }#if (CellType[cellnumber] = CAMBIALINITIAL)
+            }#if (cellRD[cellnumber] > MinDDivision)
+          }#if (auxinconc[cellnumber]
+        }#if celldead[cellnumber]<>true
+      }#for LoopNumber :=1
 
 
-   } else { #if ((MaxTempMean[logday]
-     print(paste('WARNING:Temperature was unsuitable for cell division on', logdate[day]))
-                }
+    } else { #if ((MaxTempMean[logday]
+      print(paste('WARNING:Temperature was unsuitable for cell division on', logdate[day]))
+    }
 
   } else {#if (PhotosynthatePerCell[logday]
-               print(paste('WARNING:No photosynthate was available for metabolic activity and cell plate formation on', logdate[day]))
+    print(paste('WARNING:No photosynthate was available for metabolic activity and cell plate formation on', logdate[day]))
   }
 
 
-    # Assign objects to the global environment
-    CritCellCycleDuration <<- CritCellCycleDuration
-    TooManyCellsFlag <<- TooManyCellsFlag
-    TotalCells <<- TotalCells
-    TotalLoopSize <<- TotalLoopSize
-    CellKey <<- CellKey
-    cellRD <<- cellRD
-    CellVolume <<- CellVolume
-    LumenVolume <<- LumenVolume
-    LumenCSArea <<- LumenCSArea
-    CellCSArea <<- CellCSArea
-    CellWallCSArea <<- CellWallCSArea
-    TimeSinceMitosis <<- TimeSinceMitosis
-    MeristematicStatus <<- MeristematicStatus
-    DifferentiationStatus <<- DifferentiationStatus
-    MotherCellNumber <<- MotherCellNumber
-    AuxinConc <<- AuxinConc
-    CellType <<- CellType
-    CellLength <<- CellLength
-    TanPosition <<- TanPosition
-    FormationDate <<- FormationDate
-    FormationDay <<- FormationDay
-    UpperTanInitialNeighbour <<- UpperTanInitialNeighbour
-    LowerTanInitialNeighbour <<- LowerTanInitialNeighbour
-    UpperRadNeighbour <<- UpperRadNeighbour
-    LowerRadNeighbour <<- UpperRadNeighbour
-    PreviousAuxinCanal <<- PreviousAuxinCanal
-    CurrentAuxinCanal <<- CurrentAuxinCanal
-    InitialCell <<- InitialCell
-    RadPosition <<- RadPosition
+  # Assign objects to the global environment
+  CritCellCycleDuration <<- CritCellCycleDuration
+  TooManyCellsFlag <<- TooManyCellsFlag
+  TotalCells <<- TotalCells
+  TotalLoopSize <<- TotalLoopSize
+  CellKey <<- CellKey
+  cellRD <<- cellRD
+  CellVolume <<- CellVolume
+  LumenVolume <<- LumenVolume
+  LumenCSArea <<- LumenCSArea
+  CellCSArea <<- CellCSArea
+  CellWallCSArea <<- CellWallCSArea
+  TimeSinceMitosis <<- TimeSinceMitosis
+  MeristematicStatus <<- MeristematicStatus
+  DifferentiationStatus <<- DifferentiationStatus
+  MotherCellNumber <<- MotherCellNumber
+  AuxinConc <<- AuxinConc
+  CellType <<- CellType
+  CellLength <<- CellLength
+  TanPosition <<- TanPosition
+  FormationDate <<- FormationDate
+  FormationDay <<- FormationDay
+  UpperTanInitialNeighbour <<- UpperTanInitialNeighbour
+  LowerTanInitialNeighbour <<- LowerTanInitialNeighbour
+  UpperRadNeighbour <<- UpperRadNeighbour
+  LowerRadNeighbour <<- UpperRadNeighbour
+  PreviousAuxinCanal <<- PreviousAuxinCanal
+  CurrentAuxinCanal <<- CurrentAuxinCanal
+  InitialCell <<- InitialCell
+  RadPosition <<- RadPosition
 
 }
-
