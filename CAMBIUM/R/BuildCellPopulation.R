@@ -51,7 +51,7 @@ BuildCellPopulation <- function() {
   cellRD        <- rep(NA,Cells_init)
   MeristematicStatus <- rep(NA,Cells_init)
   DistFromRay   <- rep(NA,Cells_init)
-  #TanPosition   <- rep(NA,Cells_init)
+  TanPosition   <- rep(NA,Cells_init)
   RadPosition   <- rep(0,Cells_init)
   MinInitialPosition  <- rep(0,totaldays)
   MaxInitialPosition  <- rep(0,totaldays)

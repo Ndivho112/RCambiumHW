@@ -154,10 +154,16 @@ print("dividion occured")
                 } else {
                   CellType[TotalCells] <- "RAYINITIALC"
                 }
-
-                if (CellType[UpperRadNeighbour[n]] == "PHLOEMMOTHERCELL" ||
-                    CellType[UpperRadNeighbour[n]] == "RAYINITIALP" ||
-                    CambiumWidth[day] < 7) {
+                
+                CellType[is.na(CellType)] <- "UNKNOWN"
+                UpperRadNeighbour[is.na(UpperRadNeighbour)] <- NA
+                
+                # Check if UpperRadNeighbour[n] is valid
+                if (!is.na(UpperRadNeighbour[n]) && UpperRadNeighbour[n] > 0 && UpperRadNeighbour[n] <= length(CellType)) {
+                  # Now check the conditions
+                  if (CellType[UpperRadNeighbour[n]] == "PHLOEMMOTHERCELL" ||
+                      CellType[UpperRadNeighbour[n]] == "RAYINITIALP" ||
+                      CambiumWidth[day] < 7) {
                   # If at least one PMC exists or "foliage conditions" are bad
                   # then produce XMC's
 
@@ -165,6 +171,7 @@ print("dividion occured")
                     CellType[n] <- "XYLEMMOTHERCELL"
                   } else {
                     CellType[n] <- "RAYINITIALX"
+                  }
                   }
 
                   # The daughter cell is positioned "bark-ward" of the mother cell

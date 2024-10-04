@@ -1,0 +1,329 @@
+---
+title: "CAMBIUM_Model_Interface"
+author: "Nemutshili Ndivho"
+date: "2024-09-30"
+output: html_document
+---
+## Introduction
+
+This Shiny app provides an interface for running the **CAMBIUM Model**, a process-based model for simulating daily xylem development in Eucalyptus trees. Users can upload their custom input data, modify simulation parameters, and visualize results. The app is designed with multiple tabs to manage inputs, run the model, and display results, making it easier to use for researchers and analysts.
+
+## Setup: Load Required Libraries
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load required libraries for the application
+library(shiny)
+library(shinythemes)
+library(CAMBIUM)
+library(DT)
+library(shinyjs)
+```
+
+## Custom CSS for Styling
+
+This section defines custom CSS that is applied throughout the Shiny app for consistent styling. It adjusts the background colors, button styles, headings, sidebar, and more for a polished user interface.
+
+```{r Custom}
+custom_css <- "
+  body {
+    background-color: #f0f8ff;
+    font-family: Arial, sans-serif;
+  }
+  .nav-tabs {
+    background-color: #009688;
+  }
+  .nav-tabs > li > a {
+    color: white;
+    padding: 15px;
+  }
+  .nav-tabs > li > a:hover {
+    background-color: #00796b;
+  }
+  .btn-primary {
+    background-color: #ff5722;
+    border-color: #ff5722;
+  }
+  .btn-primary:hover {
+    background-color: #e64a19;
+    border-color: #e64a19;
+  }
+  h2, h4 {
+    color: #004d40;
+  }
+  .dataTables_wrapper {
+    margin: 20px;
+  }
+  .shiny-input-container {
+    margin-bottom: 15px;
+  }
+  .plot-container {
+    margin-top: 20px;
+  }
+  .sidebar {
+    background-color: #009688;
+    color: #fff;
+  }
+  .sidebar h3, .sidebar h4, .sidebar label {
+    color: #fff;
+  }
+  .main-panel {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+  }
+  .footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    color: #666;
+    background-color: #f0f0f0;
+  }
+  .loading-spinner {
+    display: none;
+    text-align: center;
+  }
+  .loading-spinner img {
+    width: 50px;
+  }
+"
+```
+
+## User Interface (UI)
+
+This section defines the User Interface (UI) for the Shiny app. It creates multiple tabs including the Home, Run Model, Parameters & Instructions, and About tabs. Each tab contains specific controls and displays, making the interface user-friendly and functional.
+
+```{r UI}
+# Define UI for Application
+ui <- fluidPage(
+  theme = shinytheme("cerulean"),
+
+  # Include the custom CSS
+  tags$head(
+    tags$style(HTML(custom_css))
+  ),
+
+  # Define the navigation bar with different tabs
+  navbarPage(
+    "CAMBIUM Model Interface",
+
+    # Home Tab
+    tabPanel("Home",
+             fluidRow(
+               column(12,
+                      div(style = "text-align: center; padding: 50px;",
+                          h2("Welcome to the CAMBIUM Model Shiny App"),
+                          h4("Process-Based Model of Daily Xylem Development in Eucalyptus"),
+                          p("This application allows you to simulate daily xylem development in Eucalyptus trees using the CAMBIUM model. Customize inputs, run simulations, and visualize results with ease."),
+                          br(),
+                          h4("Key Features:"),
+                          tags$ul(
+                            tags$li("Upload custom forcing and parameter data"),
+                            tags$li("Adjust simulation settings"),
+                            tags$li("View and edit model parameters")
+                          ),
+                          br(),
+                          h4("Use the navigation bar above to get started!")
+                      )
+               )
+             )
+    ),
+
+    # Run Model Tab
+    tabPanel("Run Model",
+             sidebarLayout(
+               sidebarPanel(
+                 class = "sidebar",
+                 h3("Input Data"),
+                 fileInput("file_forcing", "Upload Forcing Data (CSV)", accept = c(".csv")),
+                 fileInput("file_param", "Upload Parameters Data (CSV)", accept = c(".csv")),
+                 h3("Settings"),
+                 checkboxInput("debug_print", "Enable Debug Printing", value = TRUE),
+                 actionButton("run_model", "Run CAMBIUM Model", class = "btn btn-primary"),
+                 downloadButton("download_results", "Download Results as CSV", class = "btn btn-primary")
+               ),
+
+               mainPanel(
+                 class = "main-panel",
+                 h4("Model Status"),
+                 textOutput("run_status"),
+                 div(class = "loading-spinner", id = "loading_spinner",
+                     img(src = "https://www.wpfaster.org/wp-content/uploads/2013/06/loading-gif.gif"),
+                     p("Running... Please wait.")
+                 ),
+                 br(),
+                 h4("Model Output"),
+                 verbatimTextOutput("model_output")
+               )
+             )
+    ),
+
+    # Parameters & Instructions Tab
+    tabPanel("Parameters & Instructions",
+             sidebarLayout(
+               sidebarPanel(
+                 class = "sidebar",
+                 h4("Model Parameters")
+               ),
+
+               mainPanel(
+                 class = "main-panel",
+                 h4("Parameters Table"),
+                 DTOutput("params_table"),
+                 br(),
+                 h4("Instructions Table"),
+                 DTOutput("instructions_table")
+               )
+             )
+    ),
+
+    # About Tab
+    tabPanel("About",
+             fluidRow(
+               column(12,
+                      div(style = "text-align: center; padding: 50px;",
+                          h3("About CAMBIUM"),
+                          p("The CAMBIUM model simulates daily xylem development in Eucalyptus trees. This app provides an interface for running the model with user-provided data."),
+                          br(),
+                          h4("References"),
+                          p("Drew, D. M., Downes, G. M., & Battaglia, M. (2010). CAMBIUM, a process-based model of daily xylem development in Eucalyptus. Journal of Theoretical Biology, 264(2), 395–406. https://doi.org/10.1016/j.jtbi.2010.02.013"),
+                          br(),
+                          h4("Created by Nemutshili Ndivho Confidence")
+                      )
+               )
+             )
+    )
+  ),
+
+  # Footer
+  tags$footer(class = "footer",
+              "© 2024 Nemutshili Ndivho Confidence. All rights reserved."
+  )
+)
+```
+
+## Server Logic
+
+The server logic processes the input files, runs the CAMBIUM model, and displays the results. It includes data validation, error handling, and displays the model output on the UI.
+
+```{r Server}
+server <- function(input, output, session) {
+
+  # ---- Reactive Values ----
+  model_results <- reactiveVal(NULL)
+
+  # ---- Render Data Tables ----
+  output$params_table <- renderDT({
+    data(params)  # Ensure 'params' is a valid data frame
+    datatable(params, options = list(pageLength = 10, autoWidth = TRUE))
+  })
+
+  output$instructions_table <- renderDT({
+    data(runsettings)  # Ensure 'runsettings' is a valid data frame
+    datatable(runsettings, options = list(pageLength = 10, autoWidth = TRUE))
+  })
+
+  # ---- Event Handlers ----
+  observeEvent(input$run_model, {
+    req(input$file_forcing, input$file_param)
+
+    # Show loading spinner
+    shinyjs::show("loading_spinner")
+
+    start_time <- Sys.time()
+
+    # Read the uploaded files
+    filename_forcing <- input$file_forcing$datapath
+    filename_param <- input$file_param$datapath
+
+    # Run the CAMBIUM model
+    output$run_status <- renderText("Running CAMBIUM Model...")
+
+    tryCatch({
+      if (input$debug_print) {  # Correctly using input$debug_print
+        # Print debug information before running the model
+        cat("Debug: Forcing file path:", filename_forcing, "\n")
+        cat("Debug: Parameter file path:", filename_param, "\n")
+        cat("Debug: Run settings:\n")
+        str(runsettings)  # Use str() to display the structure of runsettings
+      }
+
+      # Capture the results from the CAMBIUM model run
+      results <- run_CAMBIUM(
+        filename_forcing = filename_forcing,
+        filename_param = filename_param,
+        run_settings = runsettings
+      )
+
+      model_results(results)  # Store results in a reactive value
+      output$model_output <- renderText("Model run completed successfully.")
+
+      # Hide loading spinner and display run duration
+      shinyjs::hide("loading_spinner")
+      run_duration <- Sys.time() - start_time
+      output$run_status <- renderText(paste("CAMBIUM Run duration was:", round(run_duration, 2), "seconds."))
+
+    }, error = function(e) {
+      output$model_output <- renderText(paste("Error in running CAMBIUM model:", e$message))
+
+      # Hide loading spinner in case of error
+      shinyjs::hide("loading_spinner")
+    })
+  })
+
+  # ---- Download Handler for CSV ----
+  output$download_results <- downloadHandler(
+    filename = function() {
+      paste("CAMBIUM_results_", Sys.Date(), ".csv", sep = "")
+    },
+    content = function(file) {
+      # Get the list of objects in the environment
+      object_names <- ls(envir = .GlobalEnv)
+
+      # Create an empty list to store the objects as columns
+      columns <- list()
+
+      # Find the maximum length of all objects that have more than one value
+      max_length <- max(sapply(object_names, function(x) {
+        obj_len <- length(get(x, envir = .GlobalEnv))
+        if (obj_len > 1) return(obj_len)
+        return(0)  # Ignore objects with only one value
+      }))
+
+      # Loop through each object and store it as a column in the list
+      for (object_name in object_names) {
+        obj <- get(object_name, envir = .GlobalEnv)  # Retrieve the object from the global environment
+
+        # Ensure the object is of a compatible type (numeric, character, logical)
+        if ((is.numeric(obj) || is.character(obj) || is.logical(obj)) && length(obj) > 1) {
+          # Pad the object with NAs to make its length equal to max_length
+          padded_obj <- c(obj, rep(NA, max_length - length(obj)))
+          columns[[object_name]] <- padded_obj
+        } else {
+          cat("Skipping", object_name, "- not a compatible type (numeric/character/logical) or has only one value\n")
+        }
+      }
+
+      # Convert the list to a data frame named 'Output'
+      if (length(columns) > 0) {
+        Output <- as.data.frame(columns)
+
+        # Write the output to the CSV file
+        write.csv(Output, file = file, row.names = FALSE)
+      } else {
+        cat("No compatible objects with more than one value found\n")
+      }
+    }
+  )
+}
+```
+
+## Run the Application
+
+The Shiny app is launched using the shinyApp function, combining both the UI and server components.
+
+```{r Run App}
+shinyApp(ui = ui, server = server)
+```
