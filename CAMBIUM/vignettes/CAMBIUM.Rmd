@@ -32,11 +32,7 @@ To run CAMBIUM, one needs three types of inputs:
 These are briefly described here. Then, an example model is run shown the default parameter set and provided forcing data.
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-library(knitr)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
 ```{r setup}
@@ -110,11 +106,16 @@ knitr::kable(runsettings, format = "markdown")
 
 ```{r model_run, eval=FALSE}
 
-debug_print=TRUE # for testing, have TRUE, prints more output during sim
-run_CAMBIUM(filename_forcing = "/Users/annemarie/Documents/1_TreeMort/2_Analysis/3_analysis_WFM/Models/CAMBIUM/Forcing_Data_Parameters/CABALAOutputs.csv",
-            filename_param = "/Users/annemarie/Documents/1_TreeMort/2_Analysis/3_analysis_WFM/Models/CAMBIUM/Forcing_Data_Parameters/XylemParameters.csv",
-            run_settings =runsettings)
+# Define debug_print
+debug_print <- TRUE  # Set to TRUE for testing; prints more output during simulation
 
+# Run the CAMBIUM model
+run_CAMBIUM(
+  filename_forcing = "./Forcing_Data_Parameters/CABALAOutputs.csv",
+  filename_param = "./Forcing_Data_Parameters/XylemParameters.csv",
+  run_settings = runsettings,
+  debug_print = debug_print  # Pass debug_print to the function
+)
 # filename_param should be made so that it could be replaced with the data frame that can be loaded in from the package data as shown in one of the above chunks.
 
 
@@ -126,9 +127,56 @@ run_CAMBIUM(filename_forcing = "/Users/annemarie/Documents/1_TreeMort/2_Analysis
 This part is to be expanded a lot in the future. Some example outputs are already shown below:
 
 ```{r post_processing, eval=FALSE}
+# Get the list of objects in the environment
+object_names <- ls()
+# Check the type of each object in the environment
+for (object_name in object_names) {
+  obj <- get(object_name)  # Retrieve the object
+  cat(object_name, "is of type:", class(obj), "\n")
+}
+```
 
+# Output Table
 
+```{r Output}
+# Get the list of objects in the environment
+object_names <- ls()
 
+# Create an empty list to store the objects as columns
+columns <- list()
+
+# Find the maximum length of all objects that have more than one value
+max_length <- max(sapply(object_names, function(x) {
+  obj_len <- length(get(x))
+  if (obj_len > 1) return(obj_len)
+  return(0)  # Ignore objects with only one value
+}))
+
+# Loop through each object and store it as a column in the list
+for (object_name in object_names) {
+  obj <- get(object_name)  # Retrieve the object from the global environment
+  
+  # Ensure the object is of a compatible type (numeric, character, logical)
+  if ((is.numeric(obj) || is.character(obj) || is.logical(obj)) && length(obj) > 1) {
+    # Pad the object with NAs to make its length equal to max_length
+    padded_obj <- c(obj, rep(NA, max_length - length(obj)))
+    columns[[object_name]] <- padded_obj
+  } else {
+    cat("Skipping", object_name, "- not a compatible type (numeric/character/logical) or has only one value\n")
+  }
+}
+
+# Convert the list to a data frame named 'Output'
+if (length(columns) > 0) {
+  Output <- as.data.frame(columns)
+  
+  # Export the data frame to a CSV file named 'Output_results.csv'
+  write.csv(Output, file = "Output_results.csv", row.names = FALSE)
+  
+  cat("All compatible objects exported as columns to 'Output_results.csv'\n")
+} else {
+  cat("No compatible objects with more than one value found\n")
+}
 ```
 
 ```{create_run_settings, eval=FALSE}

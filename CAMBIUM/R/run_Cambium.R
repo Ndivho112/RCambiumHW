@@ -86,17 +86,18 @@ TESTING <<- FALSE
       #form_Main$refresh()
     BuildCellPopulation()  # AHES
 
-
-    if(debug_print==TRUE){
-      print(CellType[is.na(CellType)])# Testing
+    if (any(is.na(CellType))) {
+      warning("NA values found in CellType after BuildCellPopulation. Investigating...")
+      print(CellType[is.na(CellType)])
     }
 
     print(  "Determining initial cell population...")
       #form_Main$refresh()
     DetermineEarlyCambialCells()  # AHES
 
-    if(debug_print==TRUE){
-      print(CellType[is.na(CellType)])# Testing
+    if (any(is.na(CellType))) {
+      warning("NA values found in CellType after DetermineEarlyCambialCells. Investigating...")
+      print(CellType[is.na(CellType)])
     }
 
     totaldays=665

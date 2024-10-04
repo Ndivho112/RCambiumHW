@@ -26,22 +26,23 @@ CalculatePrimaryWallThickRate <- function(n) {
   if (DifferentiationStatus[n] != "SECONDARYTHICKENING" || NewSecondaryWallFlag[n] == FALSE) {
     print("in CalculatePrimaryWallThickRate")
     print(n)
+    LumenVolume[is.na(LumenVolume)] <- 0
     LumenVolume[n] <- BodyVolume(CellType[n], ( ((cellRD[n] + cellTD[n])/2) - PRIMARYWALLTHICKNESS*2),
                                           ((cellRD[n] + cellTD[n])/2) - PRIMARYWALLTHICKNESS*2, CellLength[n])
     # We calculate the lumen volume of cells not in secondary wall thickening assuming a primary wall thickness of 0.25um
-
+    LumenCSArea[is.na(LumenCSArea)] <- 0
     LumenCSArea[n] <- BodyCSArea(CellType[n], LumenVolume[n], CellLength[n], cellRD[n], cellTD[n])
- if(is.na(LumenCSArea[n])){
-   stop(print("problem:LumenCSArea[n] = NA",n))
- }
-    CellWallCSArea0[n] <- CellWallCSArea[n]
 
+    CellWallCSArea0[n] <- CellWallCSArea[n]
+    CellWallCSArea[is.na(CellWallCSArea)] <- 0
     CellWallCSArea[n] <- CellCSArea[n] - LumenCSArea[n]
 
-    if (CellWallCSArea[n] < CellWallCSArea0[n]) {
+    if (!is.na(CellWallCSArea[n]) && !is.na(CellWallCSArea0[n]) && CellWallCSArea[n] < CellWallCSArea0[n]) {
       PrimaryWallThickRate[n] <- 0
-    } else {
+    } else if (!is.na(CellWallCSArea[n]) && !is.na(CellWallCSArea0[n])) {
       PrimaryWallThickRate[n] <- CellWallCSArea[n] - CellWallCSArea0[n]
+    } else {
+      PrimaryWallThickRate[n] <- NA
     }
 
     # Basically the wall thick rate is actually independent of the "potential" rate, but the ability to store material is affected...
@@ -97,13 +98,15 @@ CalculatePotentialWallThickRate <- function(day,n) {
     PotentialVolumetricWallThickRate[n] <- PotentialVolumetricWallThickRate[n]
     # Wall thick rate in gain in volume
 
-    if (LumenVolume[n] > PotentialVolumetricWallThickRate[n]) {
+    if (!is.na(LumenVolume[n]) && !is.na(PotentialVolumetricWallThickRate[n]) && LumenVolume[n] > PotentialVolumetricWallThickRate[n]) {
       PotentialLumenVolume[n] <- LumenVolume[n] - PotentialVolumetricWallThickRate[n]
-    } else {
+    } else if (!is.na(LumenVolume[n]) && !is.na(PotentialVolumetricWallThickRate[n])) {
       PotentialLumenVolume[n] <- 0
+    } else {
+      PotentialLumenVolume[n] <- NA
     }
 
-    if (PotentialLumenVolume[n] > 0) {
+    if (!is.na(PotentialLumenVolume[n]) && PotentialLumenVolume[n] > 0) {
       PotentialLumenCSArea[n] <- BodyCSArea(CellType[n], PotentialLumenVolume[n], CellLength[n], cellRD[n], cellTD[n])
     } else {
       PotentialLumenCSArea[n] <- 0
@@ -113,6 +116,7 @@ CalculatePotentialWallThickRate <- function(day,n) {
 
   } else {
     PotentialAreaWallThickRate[n] <- 0
+  }
 
     #release into globalenv:
     PotentialLumenCSArea             <<- PotentialLumenCSArea
@@ -122,7 +126,7 @@ CalculatePotentialWallThickRate <- function(day,n) {
     MaxThickeningCellPosition        <<- MaxThickeningCellPosition
 
   }
-}
+
 
 
 #' Calculate Secondary Wall Thick Rate
@@ -244,6 +248,9 @@ CalculateStorageChange <- function(day,n) {
       # We calculate the contribution to or withdrawal from the "WallThickStoreArea" for primary wall thickening cells here
       # because the PotentialAreaWallThickRate has been properly refreshed
 
+      PrimaryWallThickRate[is.na(PrimaryWallThickRate)] <- 0
+      PotentialAreaWallThickRate[is.na(PotentialAreaWallThickRate)] <- 0
+
       if (PotentialAreaWallThickRate[n] > PrimaryWallThickRate[n]) {
         # Calculate potential increase in storage volume
         PotentialStorageIncreaseVolume <- LumenVolume[n] - BodyVolume(CellType[n], sqrt(((LumenCSArea[n] - (PotentialAreaWallThickRate[n] - PrimaryWallThickRate[n]))/pi))*2,
@@ -253,7 +260,12 @@ CalculateStorageChange <- function(day,n) {
 
         PotentialStorageIncreaseMass <- ((PotentialStorageIncreaseVolume / 10^12) * (1 / WallConversionFactor) * 1000000) + PotentialStorageIncreaseMass
         # Mass in ug
+
       } else {
+        PrimaryWallThickRate[is.na(PrimaryWallThickRate)] <- 0
+        PotentialAreaWallThickRate[is.na(PotentialAreaWallThickRate)] <- 0
+        LumenCSArea[is.na(LumenCSArea)] <- 0
+        LumenVolume[is.na(LumenVolume)] <- 0
         if ((PrimaryWallThickRate[n] - PotentialAreaWallThickRate[n]) < LumenCSArea[n]) {
           # Calculate potential decrease in storage volume
           PotentialStorageDecreaseVolume <- LumenVolume[n] - BodyVolume(CellType[n], sqrt(((LumenCSArea[n] - (PrimaryWallThickRate[n] - PotentialAreaWallThickRate[n]))/pi))*2,
@@ -379,6 +391,10 @@ CalculateWallThickness <- function(n) {
 
     CellWallCSArea[n] <- CellCSArea[n] - LumenCSArea[n]
   }
+
+  CellWallCSArea[is.na(CellWallCSArea)] <- 0
+  LumenCSArea[is.na(LumenCSArea)] <- 0
+  LumenVolume[is.na(LumenVolume)] <- 0
 
   if (CellWallCSArea[n] > CellCSArea[n]) {
     LumenCSArea[n] <- 0

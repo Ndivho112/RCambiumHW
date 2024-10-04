@@ -16,6 +16,7 @@
 #' @export
 #' @example
 CalculateRadCrushableDistance <- function(n, positioncellcounter) {
+  cellTD[is.na(cellTD)] <- 0
 
   if ((RadPosition[n] - cellTD[n]/2) < RadPosition[positioncellcounter] &&
       (RadPosition[n] + cellTD[n]/2) > RadPosition[positioncellcounter]) {
@@ -84,12 +85,14 @@ CalculateTanCrushableDistance <- function(n,PositionCellCounter) {
         CellType[PositionCellCounter] == "RAYINITIALP" ||
         CellType[PositionCellCounter] == "RAYINITIALX") {
       if (TanPosition[PositionCellCounter] < TanPosition[n]) {
+        cellTD[is.na(cellTD)] <- 0
         if ((TanPosition[PositionCellCounter] + cellTD[PositionCellCounter]/2) > MaxTanNonCrushableCellDistanceLower[n]) {
           # The potential growth of "n" would infringe upon "positioncellcounter's"
           # right edge
           MaxTanNonCrushableCellDistanceLower[n] <<- TanPosition[PositionCellCounter] + cellTD[PositionCellCounter]/2
         }
       } else if (TanPosition[PositionCellCounter] > TanPosition[n]) {
+        cellTD[is.na(cellTD)] <- 0
         if ((TanPosition[PositionCellCounter] - cellTD[PositionCellCounter]/2) < MaxTanNonCrushableCellDistanceUpper[n]) {
           # The potential growth of "n" would infringe upon "positioncellcounter's"
           # left edge
@@ -242,6 +245,8 @@ CalculateRadialShift <- function() {
     for (i in 1:TotalLoopSize) {
       positioncellcounter <- CellKey[i]
 
+      cellTD[is.na(cellTD)] <- 0
+
       if ((TanPosition[positioncellcounter] < TanPosition[cellnumber] + cellTD[cellnumber]/2) &
           (TanPosition[positioncellcounter] > TanPosition[cellnumber] - cellTD[cellnumber]/2)) {
 
@@ -312,6 +317,9 @@ CalculateActualSize <- function(n,positioncellcounter) {
   # to be in keeping with the logic below, I would use cellRD0 and cellTD0 for the below two lines ( or leave these two out alltogether?!)
   cellRD[n] <- cellRD[n] + UpperRadGrowthRate[n] + LowerRadGrowthRate[n]
   cellTD[n] <- cellTD[n] + UpperTanGrowthRate[n] + LowerTanGrowthRate[n]
+
+  cellRD[is.na(cellRD)] <- 0
+  cellTD[is.na(cellTD)] <- 0
 
   if (cellRD[n] < 0 || cellTD[n] < 0){
     CrushCells(positioncellcounter)# wants positioncellcounter
