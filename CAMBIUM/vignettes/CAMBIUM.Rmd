@@ -106,16 +106,22 @@ knitr::kable(runsettings, format = "markdown")
 
 ```{r model_run, eval=FALSE}
 
-# Define debug_print
-debug_print <- TRUE  # Set to TRUE for testing; prints more output during simulation
+debug_print <- TRUE  # Set globally
 
-# Run the CAMBIUM model
+# Use debug flag inside or before calling the function
+if (debug_print) {
+  cat("Starting CAMBIUM model with debugging on...\n")
+}
+
 run_CAMBIUM(
   filename_forcing = "./Forcing_Data_Parameters/CABALAOutputs.csv",
   filename_param = "./Forcing_Data_Parameters/XylemParameters.csv",
-  run_settings = runsettings,
-  debug_print = debug_print  # Pass debug_print to the function
+  run_settings = runsettings
 )
+
+if (debug_print) {
+  cat("CAMBIUM model completed.\n")
+}
 # filename_param should be made so that it could be replaced with the data frame that can be loaded in from the package data as shown in one of the above chunks.
 
 
@@ -170,10 +176,22 @@ for (object_name in object_names) {
 if (length(columns) > 0) {
   Output <- as.data.frame(columns)
   
-  # Export the data frame to a CSV file named 'Output_results.csv'
-  write.csv(Output, file = "Output_results.csv", row.names = FALSE)
+  # Define the output directories
+  output_directory <- getwd()
+  final_plots_directory <- file.path(output_directory, "Final_plots")
   
-  cat("All compatible objects exported as columns to 'Output_results.csv'\n")
+  # Create the Final_plots directory if it does not exist
+  if (!dir.exists(final_plots_directory)) {
+    dir.create(final_plots_directory)
+  }
+  
+  # Export the data frame to a CSV file named 'Output_results.csv' in the current directory
+  write.csv(Output, file = file.path(output_directory, "Output_results.csv"), row.names = FALSE)
+  
+  # Export the data frame to a CSV file named 'Output_results.csv' in the Final_plots directory
+  write.csv(Output, file = file.path(final_plots_directory, "Output_results.csv"), row.names = FALSE)
+  
+  cat("All compatible objects exported as columns to 'Output_results.csv' in the current directory and 'Final_plots' directory\n")
 } else {
   cat("No compatible objects with more than one value found\n")
 }

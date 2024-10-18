@@ -12,7 +12,7 @@ This Shiny app provides an interface for running the **CAMBIUM Model**, a proces
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
+devtools::load_all()
 # Load required libraries for the application
 library(shiny)
 library(shinythemes)
@@ -96,13 +96,12 @@ custom_css <- "
 This section defines the User Interface (UI) for the Shiny app. It creates multiple tabs including the Home, Run Model, Parameters & Instructions, and About tabs. Each tab contains specific controls and displays, making the interface user-friendly and functional.
 
 ```{r UI}
-# Define UI for Application
+# Define the UI
 ui <- fluidPage(
   theme = shinytheme("cerulean"),
-
-  # Include the custom CSS
+  useShinyjs(),  # For showing/hiding loading spinner
   tags$head(
-    tags$style(HTML(custom_css))
+    tags$style(HTML(custom_css))  # Include custom CSS
   ),
 
   # Define the navigation bar with different tabs
@@ -137,25 +136,23 @@ ui <- fluidPage(
                sidebarPanel(
                  class = "sidebar",
                  h3("Input Data"),
-                 fileInput("file_forcing", "Upload Forcing Data (CSV)", accept = c(".csv")),
-                 fileInput("file_param", "Upload Parameters Data (CSV)", accept = c(".csv")),
+                 fileInput("forcing_data", "Upload Forcing Data (CSV)", accept = c(".csv")),
+                 fileInput("parameters_data", "Upload Parameters Data (CSV)", accept = c(".csv")),
                  h3("Settings"),
-                 checkboxInput("debug_print", "Enable Debug Printing", value = TRUE),
-                 actionButton("run_model", "Run CAMBIUM Model", class = "btn btn-primary"),
-                 downloadButton("download_results", "Download Results as CSV", class = "btn btn-primary")
+                 actionButton("run_model", "Run CAMBIUM Model", class = "btn btn-primary")
                ),
 
                mainPanel(
                  class = "main-panel",
                  h4("Model Status"),
-                 textOutput("run_status"),
+                 textOutput("run_status"),  # Display the model status (run duration)
                  div(class = "loading-spinner", id = "loading_spinner",
                      img(src = "https://www.wpfaster.org/wp-content/uploads/2013/06/loading-gif.gif"),
                      p("Running... Please wait.")
                  ),
                  br(),
                  h4("Model Output"),
-                 verbatimTextOutput("model_output")
+                 textOutput("model_output")  # Display success or error message
                )
              )
     ),
@@ -171,10 +168,10 @@ ui <- fluidPage(
                mainPanel(
                  class = "main-panel",
                  h4("Parameters Table"),
-                 DTOutput("params_table"),
+                 DTOutput("params_table"),  # Table for model parameters
                  br(),
                  h4("Instructions Table"),
-                 DTOutput("instructions_table")
+                 DTOutput("instructions_table")  # Table for instructions
                )
              )
     ),
@@ -209,8 +206,11 @@ ui <- fluidPage(
 The server logic processes the input files, runs the CAMBIUM model, and displays the results. It includes data validation, error handling, and displays the model output on the UI.
 
 ```{r Server}
-server <- function(input, output, session) {
+## Server Logic
 
+debug_print <- TRUE  # Set globally
+
+server <- function(input, output, session) {
   # ---- Reactive Values ----
   model_results <- reactiveVal(NULL)
 
@@ -227,7 +227,7 @@ server <- function(input, output, session) {
 
   # ---- Event Handlers ----
   observeEvent(input$run_model, {
-    req(input$file_forcing, input$file_param)
+    req(input$forcing_data, input$parameters_data)  # Ensure files are uploaded
 
     # Show loading spinner
     shinyjs::show("loading_spinner")
@@ -235,88 +235,52 @@ server <- function(input, output, session) {
     start_time <- Sys.time()
 
     # Read the uploaded files
-    filename_forcing <- input$file_forcing$datapath
-    filename_param <- input$file_param$datapath
+    forcing_data_path <- input$forcing_data$datapath
+    parameters_data_path <- input$parameters_data$datapath
+
+    # Debugging output
+    debug_print <- TRUE  # Global debug flag
+    if (debug_print) {
+      cat("Starting CAMBIUM model with debugging on...\n")
+      if (file.exists(forcing_data_path)) {
+        print(paste("Forcing file path:", forcing_data_path))
+      }
+      if (file.exists(parameters_data_path)) {
+        print(paste("Parameter file path:", parameters_data_path))
+      }
+    }
 
     # Run the CAMBIUM model
     output$run_status <- renderText("Running CAMBIUM Model...")
 
     tryCatch({
-      if (input$debug_print) {  # Correctly using input$debug_print
-        # Print debug information before running the model
-        cat("Debug: Forcing file path:", filename_forcing, "\n")
-        cat("Debug: Parameter file path:", filename_param, "\n")
-        cat("Debug: Run settings:\n")
-        str(runsettings)  # Use str() to display the structure of runsettings
-      }
-
-      # Capture the results from the CAMBIUM model run
+      # Assuming 'run_CAMBIUM' is a function that runs the model
       results <- run_CAMBIUM(
-        filename_forcing = filename_forcing,
-        filename_param = filename_param,
+        filename_forcing = forcing_data_path,
+        filename_param = parameters_data_path,
         run_settings = runsettings
       )
 
-      model_results(results)  # Store results in a reactive value
-      output$model_output <- renderText("Model run completed successfully.")
+      model_results(results)
 
-      # Hide loading spinner and display run duration
+      # Get the duration in minutes
+      run_duration <- as.numeric(difftime(Sys.time(), start_time, units = "mins"))
+      output$run_status <- renderText(paste("CAMBIUM run duration was:", round(run_duration, 2), "minutes."))
+
+      # Display success message after the model run
+      output$model_output <- renderText({
+        "Model ran successfully!"
+      })
+
       shinyjs::hide("loading_spinner")
-      run_duration <- Sys.time() - start_time
-      output$run_status <- renderText(paste("CAMBIUM Run duration was:", round(run_duration, 2), "seconds."))
 
     }, error = function(e) {
-      output$model_output <- renderText(paste("Error in running CAMBIUM model:", e$message))
-
-      # Hide loading spinner in case of error
+      output$model_output <- renderText({
+        paste("Error in running CAMBIUM model:", e$message)
+      })
       shinyjs::hide("loading_spinner")
     })
   })
-
-  # ---- Download Handler for CSV ----
-  output$download_results <- downloadHandler(
-    filename = function() {
-      paste("CAMBIUM_results_", Sys.Date(), ".csv", sep = "")
-    },
-    content = function(file) {
-      # Get the list of objects in the environment
-      object_names <- ls(envir = .GlobalEnv)
-
-      # Create an empty list to store the objects as columns
-      columns <- list()
-
-      # Find the maximum length of all objects that have more than one value
-      max_length <- max(sapply(object_names, function(x) {
-        obj_len <- length(get(x, envir = .GlobalEnv))
-        if (obj_len > 1) return(obj_len)
-        return(0)  # Ignore objects with only one value
-      }))
-
-      # Loop through each object and store it as a column in the list
-      for (object_name in object_names) {
-        obj <- get(object_name, envir = .GlobalEnv)  # Retrieve the object from the global environment
-
-        # Ensure the object is of a compatible type (numeric, character, logical)
-        if ((is.numeric(obj) || is.character(obj) || is.logical(obj)) && length(obj) > 1) {
-          # Pad the object with NAs to make its length equal to max_length
-          padded_obj <- c(obj, rep(NA, max_length - length(obj)))
-          columns[[object_name]] <- padded_obj
-        } else {
-          cat("Skipping", object_name, "- not a compatible type (numeric/character/logical) or has only one value\n")
-        }
-      }
-
-      # Convert the list to a data frame named 'Output'
-      if (length(columns) > 0) {
-        Output <- as.data.frame(columns)
-
-        # Write the output to the CSV file
-        write.csv(Output, file = file, row.names = FALSE)
-      } else {
-        cat("No compatible objects with more than one value found\n")
-      }
-    }
-  )
 }
 ```
 
