@@ -4,6 +4,10 @@ library(dplyr)
 library(tidyr)  # For data manipulation
 library(patchwork)  # For combining plots
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Scatter plot
+# ──────────────────────────────────────────────────────────────────────────────
+
 # Define the file path for the data
 data_file <- "./Output_results.csv"
 
@@ -40,8 +44,8 @@ units_dict <- list(
   "CellWallCSArea0" = "(m^2)",
   "ConductingXylemPosition" = "(unitless)",
   "CellCSArea" = "(m^2)",
-  "CellRD" = "(m)",
-  "CellTD" = "(m)"
+  "CellRD" = "(µm)",
+  "CellTD" = "(µm)"
 )
 
 # Define pairs of variables to plot
@@ -79,9 +83,10 @@ for (pair in plot_pairs) {
   scatter_plot <- plot_scatter(x_var, y_var, x_unit, y_unit)
   ggsave(filename = paste0("plots/scatter_", x_var, "_vs_", y_var, ".png"), plot = scatter_plot)
 }
-
-# --- New Section: Plotting Mean CellRD and CellTD per Day ---
-# Calculate mean cellRD and cellTD per day, excluding NAs
+# ──────────────────────────────────────────────────────────────────────────────
+# Plotting Mean CellRD and CellTD per Day
+# ──────────────────────────────────────────────────────────────────────────────
+# Calculate mean cellRD and cellTD per day
 mean_cellRD_cellTD_per_day <- data %>%
   group_by(DaysSinceCZExit) %>%
   summarize(mean_cellRD = mean(cellRD, na.rm = TRUE),

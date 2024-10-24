@@ -134,12 +134,35 @@ if (debug_print) {
 This part is to be expanded a lot in the future. Some example outputs are already shown below:
 
 ```{r post_processing, eval=FALSE}
-# Get the list of objects in the environment
-object_names <- ls()
-# Check the type of each object in the environment
-for (object_name in object_names) {
-  obj <- get(object_name)  # Retrieve the object
-  cat(object_name, "is of type:", class(obj), "\n")
+if (debug_print) cat("Starting output processing...\n")
+
+# Assuming model predictions are stored in a variable `Output` and observed values are in `observed_values`
+# You may load `observed_values` here if it's in an external file, for example:
+# observed_values <- read.csv("./Forcing_Data_Parameters/ObservedValues.csv")
+
+# Create a table combining model predictions and observed values
+if (exists("Output") && exists("observed_values")) {
+  
+  # Ensure that the lengths of the predictions and observed values match
+  if (nrow(Output) == nrow(observed_values)) {
+    
+    # Combine the data
+    combined_data <- cbind(Output, Observed = observed_values)
+    
+    # Export the combined data as a CSV for further analysis
+    write.csv(combined_data, file = file.path(getwd(), "Combined_Model_Observed.csv"), row.names = FALSE)
+    
+    # Print a preview of the combined data
+    knitr::kable(head(combined_data), format = "markdown")
+    
+    cat("Model predictions and observed values combined and saved to 'Combined_Model_Observed.csv'.\n")
+    
+  } else {
+    cat("Warning: The number of rows in model predictions and observed values do not match.\n")
+  }
+  
+} else {
+  cat("Either 'Output' or 'observed_values' does not exist.\n")
 }
 ```
 
@@ -198,7 +221,7 @@ if (length(columns) > 0) {
 }
 ```
 
-```{create_run_settings, eval=FALSE}
+```{run_settings_creation, eval=FALSE}
 
 
 # Create a vector of instructions

@@ -33,8 +33,8 @@ units_dict <- list(
   "CellWallCSArea0" = "(m^2)",
   "ConductingXylemPosition" = "(unitless)",
   "CellCSArea" = "(m^2)",
-  "CellRD" = "(m)",
-  "CellTD" = "(m)"
+  "CellRD" = "(µm)",
+  "CellTD" = "(µm)"
 )
 
 # Pairs to plot
