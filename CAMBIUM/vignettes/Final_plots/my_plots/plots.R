@@ -38,7 +38,7 @@ plot1 <- ggplot(data_file, aes(x = RadPosition, y = TanPosition, fill = as.facto
   guides(fill = guide_legend(override.aes = list(size = 5))) # Make legend dots bigger for clarity
 
 # Save Plot 1
-ggsave("my_plots/cell_type_plot.png", plot = plot1, width = 8, height = 6)
+ggsave("my_plots/cell_type_plot.png", plot = plot1, width = 10, height = 8)
 
 # ──── Subsection 5.2: Cell Wall Thickness Only ─────────────────────────────────
 plot2 <- ggplot(data_file, aes(x = RadPosition, y = TanPosition, size = CellWallThickness)) +
@@ -51,7 +51,7 @@ plot2 <- ggplot(data_file, aes(x = RadPosition, y = TanPosition, size = CellWall
   )
 
 # Save Plot 2
-ggsave("my_plots/cell_wall_thickness_plot.png", plot = plot2, width = 8, height = 6)
+ggsave("my_plots/cell_wall_thickness_plot.png", plot = plot2, width = 10, height = 8)
 
 # ──── Subsection 5.3: Combined Cell Type and Wall Thickness ─────────────────────
 plot3 <- ggplot(data_file, aes(x = RadPosition, y = TanPosition,
@@ -67,7 +67,7 @@ plot3 <- ggplot(data_file, aes(x = RadPosition, y = TanPosition,
   guides(fill = guide_legend(override.aes = list(size = 5))) # Make legend dots bigger for clarity
 
 # Save Plot 3
-ggsave("my_plots/combined_cell_type_wall_thickness_plot.png", plot = plot3, width = 8, height = 6)
+ggsave("my_plots/combined_cell_type_wall_thickness_plot.png", plot = plot3, width = 10, height = 8)
 
 # ──── Section 6: Raster Cell ──────────────────────────────────────────────────
 # Repeat the plots using gridExtra and patchwork
@@ -76,13 +76,13 @@ ggsave("my_plots/combined_cell_type_wall_thickness_plot.png", plot = plot3, widt
 combined_plot <- grid.arrange(plot1, plot2, plot3, nrow = 2)
 
 # Save the combined raster plot
-ggsave("my_plots/raster_combined_plot_gridextra.png", combined_plot, width = 12, height = 8)
+ggsave("my_plots/raster_combined_plot_gridextra.png", combined_plot, width = 12, height = 10)
 
 # Combine the three plots using patchwork and arrange them into a grid
 combined_plot_patchwork <- (plot1 | plot2) / plot3
 
 # Save the combined raster plot
-ggsave("my_plots/raster_combined_plot_patchwork.png", combined_plot_patchwork, width = 12, height = 8)
+ggsave("my_plots/raster_combined_plot_patchwork.png", combined_plot_patchwork, width = 12, height = 10)
 
 # ──────────────────────────────────────────────────────────────────────────────
 # End of Script
