@@ -124,7 +124,7 @@ if (nrow(mean_cellRD_cellTD_per_day) == 0) {
 plot_mean_cellRD <- ggplot(mean_cellRD_cellTD_per_day, aes(x = DaysSinceCZExit, y = mean_cellRD)) +
   geom_point(color = "#0072B2", size = 3) +
   geom_line(color = "#0072B2", linewidth = 1.5) +
-  labs(x = "Days Since CZ Exit (days)", y = "Mean cellRD (m)", title = "Mean cellRD Over Time") +
+  labs(x = "Days Since CZ Exit (days)", y = "Mean cellRD (µm)", title = "Mean cellRD Over Time") +
   theme_minimal(base_size = 14) +
   theme(axis.title = element_text(size = 12),
         axis.text = element_text(size = 10),
@@ -134,7 +134,7 @@ plot_mean_cellRD <- ggplot(mean_cellRD_cellTD_per_day, aes(x = DaysSinceCZExit, 
 plot_mean_cellTD <- ggplot(mean_cellRD_cellTD_per_day, aes(x = DaysSinceCZExit, y = mean_cellTD)) +
   geom_point(color = "#D55E00", size = 3) +
   geom_line(color = "#D55E00", linewidth = 1.5) +
-  labs(x = "Days Since CZ Exit (days)", y = "Mean cellTD (m)", title = "Mean cellTD Over Time") +
+  labs(x = "Days Since CZ Exit (days)", y = "Mean cellTD (µm)", title = "Mean cellTD Over Time") +
   theme_minimal(base_size = 14) +
   theme(axis.title = element_text(size = 12),
         axis.text = element_text(size = 10),
